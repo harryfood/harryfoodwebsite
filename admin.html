@@ -61,7 +61,7 @@
   </div>
 
 <script>
-  const ADMIN_PASS = "123@123a#250114*166466!9078678564543"; // mật khẩu siêu mạnh
+  const ADMIN_PASS = "123@123a#250114*166466!98251547"; // mật khẩu siêu mạnh
 
   const products = [
     "C2 Calamansi Tea",
@@ -107,8 +107,8 @@
         <td id="stock-${product.replace(/\s+/g,'-')}">${stock}</td>
         <td><input type="number" id="input-${product.replace(/\s+/g,'-')}" value="0"></td>
         <td>
-          <button class="btn-add" onclick="updateStock('${product}', 'add')">Nhập thêm</button>
-          <button class="btn-reduce" onclick="updateStock('${product}', 'reduce')">Giảm</button>
+          <button class="btn-add" onclick="updateStock('${product}','add')">Nhập thêm</button>
+          <button class="btn-reduce" onclick="updateStock('${product}','reduce')">Giảm</button>
         </td>
       `;
       tbody.appendChild(tr);
@@ -124,7 +124,6 @@
       return;
     }
 
-    // Gửi cập nhật tồn kho lên API
     const res = await fetch("https://harryfoodapi.minecraftalex052.workers.dev/inventory", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
