@@ -84,9 +84,16 @@ body::before {
 
   document.getElementById("productName").textContent = product;
   document.getElementById("productPrice").textContent = "Giá: " + productPrices[product] + " VND";
-  document.getElementById("productStock").textContent = localStorage.getItem(product) || "0";
 
-  document.getElementById("detailForm").addEventListener("submit", function(e) {
+  // Lấy tồn kho từ API
+  async function loadStock() {
+    const res = await fetch("https://harryfoodapi.minecraftalex052.workers.dev/inventory");
+    const data = await res.json();
+    document.getElementById("productStock").textContent = data[product] || "0";
+  }
+  loadStock();
+
+  document.getElementById("detailForm").addEventListener("submit", async function(e) {
     e.preventDefault();
 
     const form = e.target;
@@ -96,29 +103,27 @@ body::before {
     const className = form.className.value;
     const deliveryDate = form.deliveryDate.value;
 
-    // Trừ tồn kho
-    let stock = parseInt(localStorage.getItem(product) || "0");
-    if (quantity > stock) {
-      alert("Không đủ hàng tồn kho!");
-      return;
-    }
-    stock -= quantity;
-    localStorage.setItem(product, stock);
-    document.getElementById("productStock").textContent = stock;
-
-    // Lưu đơn hàng vào localStorage.orders
-    let orders = JSON.parse(localStorage.getItem("orders") || "[]");
+    // Gửi đơn hàng lên API
     const order = {
-      customerName: customerName,
-      className: className,
-      product: product,
-      status: status,
-      quantity: quantity,
-      deliveryDate: deliveryDate,
+      customerName,
+      className,
+      product,
+      status,
+      quantity,
+      deliveryDate,
       time: new Date().toLocaleString()
     };
-    orders.push(order);
-    localStorage.setItem("orders", JSON.stringify(orders));
+
+    const res = await fetch("https://harryfoodapi.minecraftalex052.workers.dev/order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(order)
+    });
+
+    if (!res.ok) {
+      alert("Có lỗi khi ghi nhận đơn hàng!");
+      return;
+    }
 
     // Ngăn spam: disable form
     Array.from(form.elements).forEach(el => el.disabled = true);

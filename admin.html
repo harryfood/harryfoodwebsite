@@ -61,7 +61,7 @@
   </div>
 
 <script>
-  const ADMIN_PASS = "123@123a#250114*166466!98251547"; // mật khẩu siêu mạnh
+  const ADMIN_PASS = "123@123a#250114*166466!9078678564543"; // mật khẩu siêu mạnh
 
   const products = [
     "C2 Calamansi Tea",
@@ -91,12 +91,15 @@
   }
 
   // ===== Quản lý tồn kho =====
-  function loadStockTable() {
+  async function loadStockTable() {
+    const res = await fetch("https://harryfoodapi.minecraftalex052.workers.dev/inventory");
+    const inventory = await res.json();
+
     const tbody = document.querySelector("#stockTable tbody");
     tbody.innerHTML = "";
 
     products.forEach(product => {
-      let stock = parseInt(localStorage.getItem(product) || "0");
+      let stock = parseInt(inventory[product] || "0");
 
       const tr = document.createElement("tr");
       tr.innerHTML = `
@@ -104,15 +107,15 @@
         <td id="stock-${product.replace(/\s+/g,'-')}">${stock}</td>
         <td><input type="number" id="input-${product.replace(/\s+/g,'-')}" value="0"></td>
         <td>
-          <button class="btn-add" onclick="addStock('${product}')">Nhập thêm</button>
-          <button class="btn-reduce" onclick="reduceStock('${product}')">Giảm</button>
+          <button class="btn-add" onclick="updateStock('${product}', 'add')">Nhập thêm</button>
+          <button class="btn-reduce" onclick="updateStock('${product}', 'reduce')">Giảm</button>
         </td>
       `;
       tbody.appendChild(tr);
     });
   }
 
-  function addStock(product) {
+  async function updateStock(product, action) {
     const inputId = "input-" + product.replace(/\s+/g,'-');
     const qty = parseInt(document.getElementById(inputId).value);
 
@@ -121,44 +124,30 @@
       return;
     }
 
-    let stock = parseInt(localStorage.getItem(product) || "0");
-    stock += qty;
-    localStorage.setItem(product, stock);
+    // Gửi cập nhật tồn kho lên API
+    const res = await fetch("https://harryfoodapi.minecraftalex052.workers.dev/inventory", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ product, qty, action })
+    });
 
-    document.getElementById("stock-" + product.replace(/\s+/g,'-')).textContent = stock;
-    alert("Đã nhập thêm " + qty + " cho " + product + ". Tồn kho mới: " + stock);
-  }
-
-  function reduceStock(product) {
-    const inputId = "input-" + product.replace(/\s+/g,'-');
-    const qty = parseInt(document.getElementById(inputId).value);
-
-    if (isNaN(qty) || qty <= 0) {
-      alert("Vui lòng nhập số lượng hợp lệ!");
+    if (!res.ok) {
+      alert("Có lỗi khi cập nhật tồn kho!");
       return;
     }
 
-    let stock = parseInt(localStorage.getItem(product) || "0");
-
-    if (qty > stock) {
-      alert("Không thể giảm quá số lượng tồn kho hiện tại!");
-      return;
-    }
-
-    stock -= qty;
-    localStorage.setItem(product, stock);
-
-    document.getElementById("stock-" + product.replace(/\s+/g,'-')).textContent = stock;
-    alert("Đã giảm " + qty + " cho " + product + ". Tồn kho mới: " + stock);
+    loadStockTable();
   }
 
   // ===== Dashboard đơn hàng =====
-  function loadOrders() {
-    const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+  async function loadOrders() {
+    const res = await fetch("https://harryfoodapi.minecraftalex052.workers.dev/orders");
+    const orders = await res.json();
+
     const tbody = document.querySelector("#orderTable tbody");
     tbody.innerHTML = "";
 
-    orders.forEach((order, index) => {
+    orders.forEach(order => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td>${order.customerName}</td>
@@ -166,30 +155,22 @@
         <td>${order.quantity}</td>
         <td>${order.time}</td>
         <td>
-          <button class="btn-done" onclick="markDone(${index})">Đã xử lý</button>
-          <button class="btn-reduce" onclick="cancelOrder(${index})">Huỷ</button>
+          <button class="btn-done" onclick="markDone('${order.id}')">Đã xử lý</button>
+          <button class="btn-reduce" onclick="cancelOrder('${order.id}')">Huỷ</button>
         </td>
       `;
       tbody.appendChild(tr);
     });
   }
 
-  function markDone(index) {
-    let orders = JSON.parse(localStorage.getItem("orders") || "[]");
-    orders.splice(index, 1);
-    localStorage.setItem("orders", JSON.stringify(orders));
+  async function markDone(id) {
+    await fetch(`https://harryfoodapi.minecraftalex052.workers.dev/orders/${id}/done`);
     alert("Đơn hàng đã xử lý!");
     loadOrders();
   }
 
-  function cancelOrder(index) {
-    let orders = JSON.parse(localStorage.getItem("orders") || "[]");
-    const order = orders[index];
-    let stock = parseInt(localStorage.getItem(order.product) || "0");
-    stock += order.quantity;
-    localStorage.setItem(order.product, stock);
-    orders.splice(index, 1);
-    localStorage.setItem("orders", JSON.stringify(orders));
+  async function cancelOrder(id) {
+    await fetch(`https://harryfoodapi.minecraftalex052.workers.dev/orders/${id}/cancel`);
     alert("Đơn hàng đã huỷ!");
     loadOrders();
     loadStockTable();

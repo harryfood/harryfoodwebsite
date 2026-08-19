@@ -104,8 +104,11 @@
 </div>
 
 <script>
-  function checkStock(productName, defaultStock) {
-    let stock = parseInt(localStorage.getItem(productName) || defaultStock);
+  async function checkStock(productName) {
+    const res = await fetch("https://harryfoodapi.minecraftalex052.workers.dev/inventory");
+    const inventory = await res.json();
+    const stock = parseInt(inventory[productName] || "0");
+
     if (stock <= 0) {
       alert("Xin lỗi nhưng chúng tôi hết hàng rồi, quay lại sau nhé");
     } else {
@@ -113,7 +116,10 @@
     }
   }
 
-  window.onload = function() {
+  window.onload = async function() {
+    const res = await fetch("https://harryfoodapi.minecraftalex052.workers.dev/inventory");
+    const inventory = await res.json();
+
     const products = {
       "C2 Calamansi Tea":"stock-calamansi",
       "C2 Lemon Tea":"stock-lemon",
@@ -127,11 +133,8 @@
     };
 
     for (const [name,id] of Object.entries(products)) {
-      const stock = localStorage.getItem(name);
-      if (stock !== null) {
-        const span = document.getElementById(id);
-        if (span) span.textContent = stock;
-      }
+      const span = document.getElementById(id);
+      if (span) span.textContent = inventory[name] || "0";
     }
   };
 </script>
