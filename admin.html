@@ -53,6 +53,8 @@
           <th>Sản phẩm</th>
           <th>Số lượng</th>
           <th>Thời gian</th>
+          <th>Lớp</th> <!-- thêm cột lớp -->
+          <th>Ngày giao hàng</th> <!-- thêm cột ngày giao -->
           <th>Thao tác</th>
         </tr>
       </thead>
@@ -152,7 +154,9 @@
         <td>${order.customerName}</td>
         <td>${order.product}</td>
         <td>${order.quantity}</td>
-        <td>${order.time}</td>
+        <td>${new Date(order.time).toLocaleString()}</td>
+        <td>${order.classroom}</td> <!-- hiển thị lớp -->
+        <td>${order.deliveryDate || ""}</td> <!-- hiển thị ngày giao -->
         <td>
           <button class="btn-done" onclick="markDone('${order.id}')">Đã xử lý</button>
           <button class="btn-reduce" onclick="cancelOrder('${order.id}')">Huỷ</button>
@@ -163,13 +167,13 @@
   }
 
   async function markDone(id) {
-    await fetch(`https://harryfoodapi.minecraftalex052.workers.dev/orders/${id}/done`);
+    await fetch(`https://harryfoodapi.minecraftalex052.workers.dev/order/${id}?action=process`, { method: "POST" });
     alert("Đơn hàng đã xử lý!");
     loadOrders();
   }
 
   async function cancelOrder(id) {
-    await fetch(`https://harryfoodapi.minecraftalex052.workers.dev/orders/${id}/cancel`);
+    await fetch(`https://harryfoodapi.minecraftalex052.workers.dev/order/${id}?action=cancel`, { method: "POST" });
     alert("Đơn hàng đã huỷ!");
     loadOrders();
     loadStockTable();
