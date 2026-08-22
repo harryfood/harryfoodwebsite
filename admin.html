@@ -53,9 +53,39 @@
           <th>Sản phẩm</th>
           <th>Số lượng</th>
           <th>Thời gian</th>
-          <th>Lớp</th> <!-- thêm cột lớp -->
-          <th>Ngày giao hàng</th> <!-- thêm cột ngày giao -->
+          <th>Lớp</th>
+          <th>Ngày giao hàng</th>
           <th>Thao tác</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <h2>Register Users</h2>
+    <form id="registerForm">
+      <label>ID User:</label>
+      <input type="text" id="userId" required>
+
+      <label>Username:</label>
+      <input type="text" id="username" required>
+
+      <label>Nickname:</label>
+      <input type="text" id="nickname" required>
+
+      <label>Class:</label>
+      <input type="text" id="class" required>
+
+      <button type="submit" class="btn-add">Add</button>
+    </form>
+
+    <h2>Danh sách người dùng</h2>
+    <table id="usersTable">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Username</th>
+          <th>Nickname</th>
+          <th>Class</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -87,6 +117,7 @@
       document.getElementById("adminPanel").style.display = "block";
       loadStockTable();
       loadOrders();
+      loadUsers();
     } else {
       alert("Sai mật khẩu!");
     }
@@ -155,8 +186,8 @@
         <td>${order.product}</td>
         <td>${order.quantity}</td>
         <td>${new Date(order.time).toLocaleString()}</td>
-        <td>${order.classroom}</td> <!-- hiển thị lớp -->
-        <td>${order.deliveryDate || ""}</td> <!-- hiển thị ngày giao -->
+        <td>${order.classroom}</td>
+        <td>${order.deliveryDate || ""}</td>
         <td>
           <button class="btn-done" onclick="markDone('${order.id}')">Đã xử lý</button>
           <button class="btn-reduce" onclick="cancelOrder('${order.id}')">Huỷ</button>
@@ -177,6 +208,55 @@
     alert("Đơn hàng đã huỷ!");
     loadOrders();
     loadStockTable();
+  }
+
+  // ===== Register Users =====
+  document.getElementById("registerForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const id = document.getElementById("userId").value.trim();
+    const username = document.getElementById("username").value.trim();
+    const nickname = document.getElementById("nickname").value.trim();
+    const className = document.getElementById("class").value.trim();
+
+    const user = { id, username, nickname, class: className };
+
+    try {
+      const res = await fetch("https://harryfoodapi.minecraftalex052.workers.dev/users/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(user)
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        alert("Lỗi thêm user: " + (data.error || "Bad Request"));
+        return;
+      }
+      alert("User đã được thêm thành công!");
+      loadUsers();
+    } catch (err) {
+      alert("Không thể kết nối API: " + err.message);
+    }
+  });
+
+   async function loadUsers() {
+    try {
+      const res = await fetch("https://harryfoodapi.minecraftalex052.workers.dev/users/all");
+      const data = await res.json();
+      const tbody = document.querySelector("#usersTable tbody");
+      tbody.innerHTML = "";
+      data.forEach(user => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${user.id}</td>
+          <td>${user.username}</td>
+          <td>${user.nickname}</td>
+          <td>${user.class}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    } catch (err) {
+      alert("Không thể tải danh sách người dùng: " + err.message);
+    }
   }
 </script>
 </body>
