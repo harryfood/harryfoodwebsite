@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>Chi tiết đặt hàng</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
     body { margin:0; font-family:"Segoe UI",Arial,sans-serif; background:#f3f3f3; color:#222; }
     header { background:#0067b8; color:white; padding:60px 20px 40px; text-align:center; }
     header h1 { font-size:56px; margin-bottom:10px; }
@@ -13,19 +13,19 @@
     nav a { background:white; color:#0067b8; padding:12px 20px; border-radius:6px;
             text-decoration:none; font-weight:600; box-shadow:0 2px 6px rgba(0,0,0,0.1); }
     nav a:hover { background:#e6f0ff; } 
-body::before {
-  content: "";
-  position: fixed;
-  top: 20px;
-  left: 0;
-  width: 100%;
-  height: calc(100% - 20px);
-  background: url("backroomss1.png") no-repeat center center;
-  background-size: cover;
-  filter: blur(6px);
-  z-index: -1;
-}
-</style>
+    body::before {
+      content: "";
+      position: fixed;
+      top: 20px;
+      left: 0;
+      width: 100%;
+      height: calc(100% - 20px);
+      background: url("backroomss1.png") no-repeat center center;
+      background-size: cover;
+      filter: blur(6px);
+      z-index: -1;
+    }
+  </style>
 </head>
 <body>
 <header>
@@ -54,7 +54,7 @@ body::before {
   <label>Lớp:</label>
   <select name="classroom" required>
     <option value="7i1">7i1</option>
-    <option value="7TH2">7TH2</option>
+    <option value="7th2">7TH2</option>
   </select><br><br>
 
   <label>Ngày giao hàng:</label>
@@ -90,9 +90,13 @@ body::before {
 
   // Lấy tồn kho từ API
   async function loadStock() {
-    const res = await fetch("https://harryfoodapi.minecraftalex052.workers.dev/inventory");
-    const data = await res.json();
-    document.getElementById("productStock").textContent = data[product] || "0";
+    try {
+      const res = await fetch("https://harryfoodapi.minecraftalex052.workers.dev/inventory");
+      const data = await res.json();
+      document.getElementById("productStock").textContent = data[product] || "0";
+    } catch {
+      document.getElementById("productStock").textContent = "Lỗi tải tồn kho";
+    }
   }
   loadStock();
 
@@ -101,15 +105,14 @@ body::before {
 
     const form = e.target;
     const status = form.status.value;
-    const quantity = parseInt(form.quantity.value);
-    const customerName = form.customerName.value;
-    const className = form.className.value;
+    const quantity = parseInt(form.quantity.value, 10);
+    const customerName = form.customerName.value.trim();
+    const classroom = form.classroom.value;
     const deliveryDate = form.deliveryDate.value;
 
-    // Gửi đơn hàng lên API
     const order = {
       customerName,
-      className,
+      classroom,
       product,
       status,
       quantity,
@@ -117,26 +120,30 @@ body::before {
       time: new Date().toLocaleString()
     };
 
-    const res = await fetch("https://harryfoodapi.minecraftalex052.workers.dev/order", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(order)
-    });
+    try {
+      const res = await fetch("https://harryfoodapi.minecraftalex052.workers.dev/order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(order)
+      });
 
-    if (!res.ok) {
-      alert("Có lỗi khi ghi nhận đơn hàng!");
-      return;
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert("Có lỗi khi ghi nhận đơn hàng: " + (data.error || "Bad Request"));
+        return;
+      }
+
+      Array.from(form.elements).forEach(el => el.disabled = true);
+      alert("Đơn hàng cho " + product + " đã được ghi nhận!");
+
+      setTimeout(() => {
+        window.location.href = "dathang.html";
+      }, 1500);
+
+    } catch (err) {
+      alert("Không thể kết nối tới API: " + err.message);
     }
-
-    // Ngăn spam: disable form
-    Array.from(form.elements).forEach(el => el.disabled = true);
-
-    alert("Đơn hàng cho " + product + " đã được ghi nhận!");
-
-    // Tự động quay về menu sau 1.5 giây
-    setTimeout(() => {
-      window.location.href = "dathang.html";
-    }, 0);
   });
 
   function goBack() {
