@@ -36,6 +36,11 @@
       z-index: -1;
       background-color: #f3f3f3; /* fallback nếu ảnh lỗi */
     }
+    body.dark-mode::before {
+      background: url("universess1.png") no-repeat center center;
+      background-size: cover;
+      filter: blur(6px);
+    }
     header {
       background: var(--header-bg);
       color: var(--header-text);
