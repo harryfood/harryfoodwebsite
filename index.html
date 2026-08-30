@@ -70,13 +70,19 @@
       background: #e6f0ff;
     }
 
-    /* Câu chào random */
-    #welcomeMessage {
+    /* Logo + slogan hoặc câu chào random */
+    #mainTitle {
       font-size: 48px;
       font-weight: 700;
-      margin-bottom: 30px;
+      margin-bottom: 10px;
       color: var(--header-text);
       animation: fadeIn 1s ease-in-out;
+    }
+    #mainSlogan {
+      font-size: 20px;
+      font-weight: 500;
+      margin-bottom: 30px;
+      color: var(--header-text);
     }
 
     @keyframes fadeIn {
@@ -115,7 +121,8 @@
 </head>
 <body>
   <header>
-    <h1 id="welcomeMessage">HarryFood</h1>
+    <h1 id="mainTitle">HarryFood</h1>
+    <p id="mainSlogan">Make eating better</p>
     <nav>
       <a href="404.html">Giới thiệu</a>
       <a href="dathang.html">Đặt hàng trước</a>
@@ -153,17 +160,19 @@ window.onload = async () => {
     document.body.classList.add("dark-mode");
   }
 
-  // Lấy uid từ URL hoặc localStorage
   const params = new URLSearchParams(window.location.search);
   let uid = params.get("uid") || localStorage.getItem("uid");
 
   const badge = document.getElementById("userBadge");
-  const welcome = document.getElementById("welcomeMessage");
+  const title = document.getElementById("mainTitle");
+  const slogan = document.getElementById("mainSlogan");
 
   if (!uid) {
     badge.textContent = "Sign In";
     badge.onclick = () => window.location.href = "signin.html";
-    welcome.textContent = "Bạn chưa đăng nhập!";
+    // Giữ nguyên logo + slogan
+    title.textContent = "HarryFood";
+    slogan.textContent = "Make eating better";
     return;
   }
 
@@ -174,7 +183,8 @@ window.onload = async () => {
     if (data.error) {
       badge.textContent = "Sign In";
       badge.onclick = () => window.location.href = "signin.html";
-      welcome.textContent = "User ID không tồn tại!";
+      title.textContent = "HarryFood";
+      slogan.textContent = "Make eating better";
       return;
     }
 
@@ -188,9 +198,13 @@ window.onload = async () => {
       `Sẵn sàng đặt món chưa, ${nickname}?`
     ];
     const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
-    welcome.textContent = randomGreeting;
+
+    // Thay logo + slogan bằng câu chào random
+    title.textContent = randomGreeting;
+    slogan.textContent = "";
   } catch {
-    welcome.textContent = "Không thể kết nối tới máy chủ!";
+    title.textContent = "HarryFood";
+    slogan.textContent = "Make eating better";
   }
 };
 </script>
