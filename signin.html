@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Sign In · HarryFood</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <style>
+    :root {
+      --bg-color: #f3f3f3;
+      --text-color: #222;
+      --accent-color: #0067b8;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: url("backroomss2.png") no-repeat center center;
+      background-size: cover;
+      filter: blur(6px);
+      z-index: -1;
+    }
+
+    .signin-box {
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      width: 340px;
+      padding: 30px;
+      text-align: center;
+      backdrop-filter: blur(4px);
+    }
+
+    .signin-box h2 {
+      color: var(--accent-color);
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    .signin-box input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+      margin-bottom: 20px;
+      outline: none;
+    }
+
+    .signin-box input:focus {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 6px rgba(0,103,184,0.3);
+    }
+
+    .keep-signin {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 10px 0 20px;
+      font-size: 14px;
+    }
+
+    .keep-signin label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .keep-signin input[type="checkbox"] {
+      transform: scale(1.2);
+      accent-color: var(--accent-color);
+    }
+
+    .signin-box button {
+      background: var(--accent-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .signin-box button:hover {
+      background: #00509e;
+    }
+  </style>
+</head>
+<body>
+  <div class="signin-box">
+    <h2>Sign in to HarryFood with User ID</h2>
+    <input type="text" id="userId" placeholder="Enter your 15-digit User ID">
+    <div class="keep-signin">
+      <label for="keepSignIn">
+        <input type="checkbox" id="keepSignIn">
+        Keep me signed in
+      </label>
+    </div>
+    <button onclick="signIn()">Sign In</button>
+  </div>
+
+  <script>
+    async function signIn() {
+      const id = document.getElementById("userId").value.trim();
+      const keep = document.getElementById("keepSignIn").checked;
+
+      if (!id) {
+        alert("Vui lòng nhập User ID!");
+        return;
+      }
+
+      try {
+        const res = await fetch(`https://harryfoodapi.minecraftalex052.workers.dev/users/${id}`);
+        const data = await res.json();
+
+        if (data.error) {
+          alert("User ID không tồn tại!");
+          return;
+        }
+
+        // Nếu chọn Keep Sign In → lưu vào localStorage
+        if (keep) {
+          localStorage.setItem("uid", id);
+        }
+
+        // Chuyển sang index.html kèm ID
+        window.location.href = `index.html?uid=${id}`;
+      } catch (err) {
+        alert("Không thể kết nối tới máy chủ! " + err.message);
+      }
+    }
+  </script>
+</body>
+</html>
