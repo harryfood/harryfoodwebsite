@@ -117,6 +117,52 @@
       font-size: 14px;
       color: #555;
     }
+.user-badge {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: white;
+  color: #0067b8;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.menu-toggle {
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.user-menu {
+  position: absolute;
+  top: 45px;
+  right: 0;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  min-width: 140px;
+}
+
+.user-menu div {
+  padding: 10px;
+  cursor: pointer;
+}
+.user-menu div:hover {
+  background: #e6f0ff;
+}
+
+.hidden {
+  display: none;
+}
+
   </style>
 </head>
 <body>
@@ -138,6 +184,15 @@
       </select>
     </div>
     <div id="userBadge" class="user-badge">Sign In</div>
+<div id="userBadge" class="user-badge">
+  <span id="userName">Sign In</span>
+  <span class="menu-toggle">⋮</span>
+  <div id="userMenu" class="user-menu hidden">
+    <div onclick="viewAccount()">Xem tài khoản</div>
+    <div onclick="logout()">Đăng xuất</div>
+  </div>
+</div>
+
   </header>
 
   <footer>© 2026 HarryFood · All rights reserved</footer>
@@ -207,6 +262,19 @@ window.onload = async () => {
     slogan.textContent = "Make eating better";
   }
 };
+document.querySelector(".menu-toggle").addEventListener("click", () => {
+  document.getElementById("userMenu").classList.toggle("hidden");
+});
+
+function viewAccount() {
+  alert("Xem thông tin tài khoản (sẽ mở trang profile).");
+}
+
+function logout() {
+  localStorage.removeItem("uid");
+  window.location.href = "index.html"; // quay về trạng thái chưa đăng nhập
+}
+
 </script>
 </body>
 </html>
