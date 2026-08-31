@@ -347,53 +347,42 @@
   }
 
   // --- User Badge logic ---
-  window.onload = async () => {
-    const badge = document.getElementById("userBadge");
-    const userName = document.getElementById("userName");
-    const menu = document.getElementById("userMenu");
+// --- User Badge logic ---
+window.addEventListener("DOMContentLoaded", async () => {
+  const badge = document.getElementById("userBadge");
+  const userName = document.getElementById("userName");
+  const menu = document.getElementById("userMenu");
 
-    const params = new URLSearchParams(window.location.search);
-    let uid = params.get("uid") || localStorage.getItem("uid");
+  const params = new URLSearchParams(window.location.search);
+  let uid = params.get("uid") || localStorage.getItem("uid");
 
-    if (!uid) {
-      userName.textContent = "Sign In";
-      badge.onclick = () => window.location.href = "signin.html?redirect=detail.html";
-      return;
-    }
+  console.log("UID lấy được:", uid);
 
-    try {
-      const resUser
-    try {
-      const resUser = await fetch(`https://harryfoodapi.minecraftalex052.workers.dev/users/${uid}`);
-      const data = await resUser.json();
+  if (!uid) {
+    userName.textContent = "Sign In";
+    badge.onclick = () => window.location.href = "signin.html?redirect=detail.html";
+    return;
+  }
 
-      if (data.error) {
-        userName.textContent = "Sign In";
-        badge.onclick = () => window.location.href = "signin.html?redirect=detail.html";
-        return;
-      }
+  try {
+    const resUser = await fetch(`https://harryfoodapi.minecraftalex052.workers.dev/users/${uid}`);
+    const data = await resUser.json();
+    console.log("Dữ liệu user:", data);
 
+    if (data && data.nickname) {
       userName.textContent = data.nickname;
       badge.onclick = () => menu.classList.toggle("hidden");
-    } catch {
+    } else {
       userName.textContent = "Sign In";
       badge.onclick = () => window.location.href = "signin.html?redirect=detail.html";
     }
-  };
-
-  function viewAccount() {
-    const uid = localStorage.getItem("uid");
-    if (uid) {
-      window.location.href = `profile.html?uid=${uid}`;
-    } else {
-      window.location.href = "signin.html?redirect=detail.html";
-    }
+  } catch (err) {
+    console.error("Lỗi fetch user:", err);
+    userName.textContent = "Sign In";
+    badge.onclick = () => window.location.href = "signin.html?redirect=detail.html";
   }
+});
 
-  function logout() {
-    localStorage.removeItem("uid");
-    window.location.href = "index.html";
-  }
 
   // Đóng menu khi click ra ngoài
   document.addEventListener("click", (e) => {
