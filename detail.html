@@ -211,6 +211,33 @@
   p#productPrice {
     color: var(--main-color);
   }
+.warning {
+  background: rgba(255,0,0,0.1);
+  border: 2px solid red;
+  color: #b30000;
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 500px;
+  margin: 20px auto;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.warning button {
+  margin-top: 10px;
+  background: red;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.warning button:hover {
+  background: #b30000;
+}
+
 </style>
 
 
@@ -234,7 +261,17 @@
         <div onclick="viewAccount()">Xem tài khoản</div>
         <div onclick="logout()">Đăng xuất</div>
       </div>
-    </div>
+   
+<div id="loginWarning" class="warning hidden">
+  <p>
+    Có vẻ bạn chưa đăng nhập. Vui lòng đăng nhập vào tài khoản khách hàng của bạn để có trải nghiệm mua hàng tốt hơn. 
+    Nếu bạn không đăng nhập, đơn hàng của bạn có khả năng bị huỷ do thông tin chưa chính xác. 
+    Nếu bạn chưa có tài khoản, hãy vui lòng đăng ký một tài khoản mới để có trải nghiệm tốt hơn.
+  </p>
+  <button onclick="window.location.href='https://forms.gle/PkGzh9gSD18eXNqR6'">
+    Đăng ký tài khoản
+  </button>
+</div>
 
 <form id="detailForm">
   <label>Trạng thái sản phẩm:</label>
@@ -392,6 +429,46 @@ window.addEventListener("DOMContentLoaded", async () => {
       menu.classList.add("hidden");
     }
   });
+window.addEventListener("DOMContentLoaded", async () => {
+  const warning = document.getElementById("loginWarning");
+  const nameInput = document.querySelector("input[name='customerName']");
+  const classSelect = document.querySelector("select[name='classroom']");
+
+  const params = new URLSearchParams(window.location.search);
+  let uid = params.get("uid") || localStorage.getItem("uid");
+
+  if (!uid) {
+    // Chưa đăng nhập
+    warning.classList.remove("hidden");
+    nameInput.disabled = false;
+    classSelect.disabled = false;
+    return;
+  }
+
+  try {
+    const resUser = await fetch(`https://harryfoodapi.minecraftalex052.workers.dev/users/${uid}`);
+    const data = await resUser.json();
+
+    if (data && data.nickname && data.classroom) {
+      // Đã đăng nhập
+      warning.classList.add("hidden");
+      nameInput.value = data.nickname;
+      classSelect.value = data.classroom;
+      nameInput.disabled = true;
+      classSelect.disabled = true;
+    } else {
+      warning.classList.remove("hidden");
+      nameInput.disabled = false;
+      classSelect.disabled = false;
+    }
+  } catch (err) {
+    console.error("Lỗi fetch user:", err);
+    warning.classList.remove("hidden");
+    nameInput.disabled = false;
+    classSelect.disabled = false;
+  }
+});
+
 </script>
 </body>
 </html>
