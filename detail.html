@@ -21,7 +21,7 @@
 
     body::before {
       content: "";
-      position: absolute; /* thay fixed bằng absolute */
+      position: fixed; 
       top: 0;
       left: 0;
       width: 100%;
@@ -371,76 +371,53 @@
     function goBack() { window.location.href = "dathang.html"; }
 
     window.addEventListener("DOMContentLoaded", async () => {
-      const badge = document.getElementById("userBadge");
-      const userName = document.getElementById("userName");
-      const menu = document.getElementById("userMenu");
-      const warning = document.getElementById("loginWarning");
-      const nameInput = document.querySelector("input[name='customerName']");
-      const classSelect = document.querySelector("select[name='classroom']");
+  const badge = document.getElementById("userBadge");
+  const userName = document.getElementById("userName");
+  const menu = document.getElementById("userMenu");
+  const warning = document.getElementById("loginWarning");
+  const nameInput = document.querySelector("input[name='customerName']");
+  const classSelect = document.querySelector("select[name='classroom']");
 
-      let uid = params.get("uid") || localStorage.getItem("uid");
-      console.log("UID lấy được:", uid);
+  const params = new URLSearchParams(window.location.search);
+  let uid = params.get("uid") || localStorage.getItem("uid");
 
-      if (!uid) {
-        userName.textContent = "Sign In";
-        badge.onclick = () => window.location.href = "signin.html?redirect=detail.html";
-        warning.classList.remove("hidden");
-        nameInput.disabled = false;
-        classSelect.disabled = false;
-        return;
-      }
+  console.log("UID lấy được:", uid);
 
-      try {
-        const resUser = await fetch(`https://harryfoodapi.minecraftalex052.workers.dev/users/${uid}`);
-        const data = await resUser.json();
-        console.log("Dữ liệu user:", data);
+  if (!uid) {
+    userName.textContent = "Sign In";
+    badge.onclick = () => window.location.href = "signin.html?redirect=detail.html";
+    warning.classList.remove("hidden");
+    nameInput.disabled = false;
+    classSelect.disabled = false;
+    return;
+  }
 
-        if (data && data.nickname && data.classroom) {
-          userName.textContent = data.nickname;
-          badge.onclick = () => menu.classList.toggle("hidden");
-          warning.classList.add("hidden");
-          nameInput.value = data.nickname;
-          classSelect.value = data.classroom;
-          nameInput.disabled = true;
-          classSelect.disabled = true;
-        } else {
-          userName.textContent = "Sign In";
-          badge.onclick = () => window.location.href = "signin.html?redirect=detail.html";
-          warning.classList.remove("hidden");
-          nameInput.disabled = false;
-          classSelect.disabled = false;
-        }
-      } catch (err) {
-        console.error("Lỗi fetch user:", err);
-        userName.textContent = "Sign In";
-        badge.onclick = () => window.location.href = "signin.html?redirect=detail.html";
-        warning.classList.remove("hidden");
-        nameInput.disabled = false;
-        classSelect.disabled = false;
-      }
-    });
+  try {
+    const resUser = await fetch(`https://harryfoodapi.minecraftalex052.workers.dev/users/${uid}`);
+    const data = await resUser.json();
+    console.log("Dữ liệu user:", data);
 
-    document.addEventListener("click", (e) => {
-      const menu = document.getElementById("userMenu");
-      const badge = document.getElementById("userBadge");
-      if (!badge.contains(e.target) && !menu.contains(e.target)) {
-        menu.classList.add("hidden");
-      }
-    });
-
-    function viewAccount() {
-      const uid = localStorage.getItem("uid");
-      if (uid) {
-        window.location.href = `profile.html?uid=${uid}`;
-      } else {
-        window.location.href = "signin.html?redirect=detail.html";
-      }
+    if (data && data.nickname && data.classroom) {
+      userName.textContent = data.nickname;
+      badge.onclick = () => menu.classList.toggle("hidden");
+      warning.classList.add("hidden");
+      nameInput.value = data.nickname;
+      classSelect.value = data.classroom;
+      nameInput.disabled = true;
+      classSelect.disabled = true;
+    } else {
+      throw new Error("User data invalid");
     }
+  } catch (err) {
+    console.error("Lỗi fetch user:", err);
+    userName.textContent = "Sign In";
+    badge.onclick = () => window.location.href = "signin.html?redirect=detail.html";
+    warning.classList.remove("hidden");
+    nameInput.disabled = false;
+    classSelect.disabled = false;
+  }
+});
 
-    function logout() {
-      localStorage.removeItem("uid");
-      window.location.href = "index.html";
-    }
   </script>
 </body>
 </html>
