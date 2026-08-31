@@ -46,5 +46,60 @@ p {
   
 <footer>© 2026 HarryFood · All rights reserved</footer>
 <footer>© HarryFood · WE DON'T USE ANY AI ON ANY OF OUR PRODUCTS</footer>
+<script>
+window.addEventListener("load", async () => {
+  const badge = document.getElementById("userBadge");
+  const userName = document.getElementById("userName");
+  const menu = document.getElementById("userMenu");
+
+  const params = new URLSearchParams(window.location.search);
+  let uid = params.get("uid") || localStorage.getItem("uid");
+
+  if (!uid) {
+    userName.textContent = "Sign In";
+    badge.onclick = () => {
+      // Lấy URL hiện tại để redirect lại sau khi login
+      const currentPage = window.location.pathname;
+      window.location.href = `signin.html?redirect=${encodeURIComponent(currentPage)}`;
+    };
+    return;
+  }
+
+  try {
+    const res = await fetch(`https://harryfoodapi.minecraftalex052.workers.dev/users/${uid}`);
+    const data = await res.json();
+
+    if (data.error) {
+      userName.textContent = "Sign In";
+      badge.onclick = () => {
+        const currentPage = window.location.pathname;
+        window.location.href = `signin.html?redirect=${encodeURIComponent(currentPage)}`;
+      };
+      return;
+    }
+
+    const nickname = data.nickname;
+    userName.textContent = nickname;
+
+    // Khi click nickname → mở menu
+    badge.onclick = () => menu.classList.toggle("hidden");
+  } catch {
+    userName.textContent = "Sign In";
+    badge.onclick = () => {
+      const currentPage = window.location.pathname;
+      window.location.href = `signin.html?redirect=${encodeURIComponent(currentPage)}`;
+    };
+  }
+});
+
+function viewAccount() {
+  window.location.href = "profile.html";
+}
+
+function logout() {
+  localStorage.removeItem("uid");
+  window.location.href = "index.html";
+}
+</script>
 </body>
 </html>
