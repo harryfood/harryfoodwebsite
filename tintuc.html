@@ -58,7 +58,6 @@ window.addEventListener("load", async () => {
   if (!uid) {
     userName.textContent = "Sign In";
     badge.onclick = () => {
-      // Lấy URL hiện tại để redirect lại sau khi login
       const currentPage = window.location.pathname;
       window.location.href = `signin.html?redirect=${encodeURIComponent(currentPage)}`;
     };
@@ -92,8 +91,15 @@ window.addEventListener("load", async () => {
   }
 });
 
+// Nút trong menu
 function viewAccount() {
-  window.location.href = "profile.html";
+  // Sang profile.html, kèm uid để hiển thị đúng user
+  const uid = localStorage.getItem("uid");
+  if (uid) {
+    window.location.href = `profile.html?uid=${uid}`;
+  } else {
+    window.location.href = "signin.html";
+  }
 }
 
 function logout() {

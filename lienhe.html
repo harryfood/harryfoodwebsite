@@ -120,7 +120,6 @@ window.addEventListener("load", async () => {
   if (!uid) {
     userName.textContent = "Sign In";
     badge.onclick = () => {
-      // Lấy URL hiện tại để redirect lại sau khi login
       const currentPage = window.location.pathname;
       window.location.href = `signin.html?redirect=${encodeURIComponent(currentPage)}`;
     };
@@ -154,62 +153,15 @@ window.addEventListener("load", async () => {
   }
 });
 
+// Nút trong menu
 function viewAccount() {
-  window.location.href = "profile.html";
-}
-
-function logout() {
-  localStorage.removeItem("uid");
-  window.location.href = "index.html";
-}
-
-window.addEventListener("load", async () => {
-  const badge = document.getElementById("userBadge");
-  const userName = document.getElementById("userName");
-  const menu = document.getElementById("userMenu");
-
-  const params = new URLSearchParams(window.location.search);
-  let uid = params.get("uid") || localStorage.getItem("uid");
-
-  if (!uid) {
-    userName.textContent = "Sign In";
-    badge.onclick = () => {
-      // Lấy URL hiện tại để redirect lại sau khi login
-      const currentPage = window.location.pathname;
-      window.location.href = `signin.html?redirect=${encodeURIComponent(currentPage)}`;
-    };
-    return;
+  // Sang profile.html, kèm uid để hiển thị đúng user
+  const uid = localStorage.getItem("uid");
+  if (uid) {
+    window.location.href = `profile.html?uid=${uid}`;
+  } else {
+    window.location.href = "signin.html";
   }
-
-  try {
-    const res = await fetch(`https://harryfoodapi.minecraftalex052.workers.dev/users/${uid}`);
-    const data = await res.json();
-
-    if (data.error) {
-      userName.textContent = "Sign In";
-      badge.onclick = () => {
-        const currentPage = window.location.pathname;
-        window.location.href = `signin.html?redirect=${encodeURIComponent(currentPage)}`;
-      };
-      return;
-    }
-
-    const nickname = data.nickname;
-    userName.textContent = nickname;
-
-    // Khi click nickname → mở menu
-    badge.onclick = () => menu.classList.toggle("hidden");
-  } catch {
-    userName.textContent = "Sign In";
-    badge.onclick = () => {
-      const currentPage = window.location.pathname;
-      window.location.href = `signin.html?redirect=${encodeURIComponent(currentPage)}`;
-    };
-  }
-});
-
-function viewAccount() {
-  window.location.href = "profile.html";
 }
 
 function logout() {

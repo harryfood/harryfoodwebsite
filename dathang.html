@@ -4,27 +4,181 @@
   <meta charset="UTF-8">
   <title>Đặt Hàng Trước</title>
   <style>
-    .product-grid { display: flex; flex-wrap: wrap; gap: 20px; }
-    .product-card { border: 1px solid #ccc; padding: 15px; width: 200px; text-align: center; cursor: pointer; transition: 0.3s; }
-    .product-card:hover { box-shadow: 0 0 10px rgba(0,0,0,0.2); }
-    .product-card img { width: 100%; height: auto; }
-    .product-card button { margin-top: 10px; padding: 8px 12px; background: #28a745; color: white; border: none; cursor: pointer; }
-    .product-card button:hover { background: #218838; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #f3f3f3;
+    color: #222;
+  }
 
-    body { margin:0; font-family:"Segoe UI",Arial,sans-serif; background:#f3f3f3; color:#222; }
-    header { background:#0067b8; color:white; padding:60px 20px 40px; text-align:center; }
-    header h1 { font-size:56px; margin-bottom:10px; }
-    header p { font-size:20px; font-weight:500; margin-bottom:30px; }
-    nav { display:flex; justify-content:center; gap:30px; }
-    nav a { background:white; color:#0067b8; padding:12px 20px; border-radius:6px; text-decoration:none; font-weight:600; box-shadow:0 2px 6px rgba(0,0,0,0.1); }
-    nav a:hover { background:#e6f0ff; } 
-    footer { text-align:center; padding:30px; font-size:14px; color:#555; }
-  </style>
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: url("backroomss2.png") no-repeat center center;
+    background-size: cover;
+    filter: blur(6px);
+    z-index: -1;
+  }
+
+  header {
+    text-align: center;
+    padding: 40px 20px 20px;
+    color: #0067b8;
+  }
+
+  header h1 {
+    font-size: 48px;
+    font-weight: 700;
+    color: #ff6600;
+    font-family: "Comic Sans MS", "Fredoka One", cursive;
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.2);
+    margin-bottom: 10px;
+  }
+
+  header p {
+    font-size: 18px;
+    font-weight: 500;
+    color: #333;
+  }
+
+  .product-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 25px;
+    padding: 30px;
+  }
+
+  .product-card {
+    background: rgba(255,255,255,0.9);
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    padding: 15px;
+    width: 180px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .product-card:hover {
+    box-shadow: 0 0 12px rgba(0,0,0,0.2);
+    transform: translateY(-3px);
+  }
+
+  .product-card img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+
+  .product-card h3 {
+    font-size: 16px;
+    margin: 10px 0 5px;
+    color: #0067b8;
+  }
+
+  .product-card p {
+    font-size: 14px;
+    color: #555;
+  }
+
+  .product-card button {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  .product-card button:hover {
+    background: #218838;
+  }
+
+  footer {
+    text-align: center;
+    padding: 30px;
+    font-size: 14px;
+    color: #555;
+  }
+.user-badge {
+  position: fixed; /* cố định vị trí */
+  top: 20px;
+  right: 20px;
+  background: white;
+  color: #0067b8;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 1000; /* đảm bảo nằm trên các phần khác */
+}
+.hidden {
+  display: none;
+}
+.user-badge {
+  position: fixed; /* cố định góc phải */
+  top: 20px;
+  right: 20px;
+  background: white;
+  color: #0067b8;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 1000;
+}
+.user-badge:hover { background: #e6f0ff; }
+
+.user-menu {
+  position: absolute;
+  top: 45px;
+  right: 0;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  min-width: 140px;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  opacity: 0;
+  transform: translateY(-5px);
+}
+.user-menu div { padding: 10px; cursor: pointer; }
+.user-menu div:hover { background: #e6f0ff; }
+
+.hidden { display: none; opacity: 0 !important; }
+.user-menu:not(.hidden) { opacity: 1; transform: translateY(0); }
+
+</style>
+
 </head>
 <body>
 <header>
   <h1>Đặt Hàng Trước</h1>
   <p>Đặt hàng trước theo ý bạn muốn🥰</p>
+<div id="userBadge" class="user-badge">
+  <span id="userName">Sign In</span>
+  <div id="userMenu" class="user-menu hidden">
+    <div onclick="viewAccount()">Xem tài khoản</div>
+    <div onclick="logout()">Đăng xuất</div>
+  </div>
+</div>
+
 </header>
 
 <h2>Menu sản phẩm HarryFood</h2>
@@ -101,43 +255,109 @@
     <p>Tồn kho: <span id="stock-mirinda">0</span></p>
     <button>Đặt ngay</button>
   </div>
+<div id="userBadge" class="user-badge">
+  <span id="userName">Sign In</span>
+  <div id="userMenu" class="user-menu hidden">
+    <div onclick="viewAccount()">Xem tài khoản</div>
+    <div onclick="logout()">Đăng xuất</div>
+  </div>
 </div>
 
-<script>
-  async function checkStock(productName) {
-    const res = await fetch("https://harryfoodapi.minecraftalex052.workers.dev/inventory");
-    const inventory = await res.json();
-    const stock = parseInt(inventory[productName] || "0");
 
-    if (stock <= 0) {
-      alert("Xin lỗi nhưng chúng tôi hết hàng rồi, quay lại sau nhé");
-    } else {
-      window.location.href = "detail.html?product=" + encodeURIComponent(productName);
-    }
+
+
+<script>
+async function checkStock(productName) {
+  const res = await fetch("https://harryfoodapi.minecraftalex052.workers.dev/inventory");
+  const inventory = await res.json();
+  const stock = parseInt(inventory[productName] || "0");
+
+  if (stock <= 0) {
+    alert("Xin lỗi nhưng chúng tôi hết hàng rồi, quay lại sau nhé");
+  } else {
+    window.location.href = "detail.html?product=" + encodeURIComponent(productName);
+  }
+}
+
+window.onload = async () => {
+  // --- Inventory ---
+  const res = await fetch("https://harryfoodapi.minecraftalex052.workers.dev/inventory");
+  const inventory = await res.json();
+  const products = {
+    "C2 Calamansi Tea":"stock-calamansi",
+    "C2 Lemon Tea":"stock-lemon",
+    "C2 Lychee Tea":"stock-lychee",
+    "C2 Icy Mint Lemon":"stock-icy-mint",
+    "C2 Strawberry Cherry":"stock-strawberry",
+    "C2 Melon Mint":"stock-melon",
+    "Fuze Tea Lemon Lemongrass":"stock-fuze",
+    "Pepsi Cola":"stock-pepsi",
+    "Mirinda Soda Cream":"stock-mirinda"
+  };
+  for (const [name,id] of Object.entries(products)) {
+    const span = document.getElementById(id);
+    if (span) span.textContent = inventory[name] || "0";
   }
 
-  window.onload = async function() {
-    const res = await fetch("https://harryfoodapi.minecraftalex052.workers.dev/inventory");
-    const inventory = await res.json();
+  // --- User Badge ---
+  const badge = document.getElementById("userBadge");
+  const userName = document.getElementById("userName");
+  const menu = document.getElementById("userMenu");
 
-    const products = {
-      "C2 Calamansi Tea":"stock-calamansi",
-      "C2 Lemon Tea":"stock-lemon",
-      "C2 Lychee Tea":"stock-lychee",
-      "C2 Icy Mint Lemon":"stock-icy-mint",
-      "C2 Strawberry Cherry":"stock-strawberry",
-      "C2 Melon Mint":"stock-melon",
-      "Fuze Tea Lemon Lemongrass":"stock-fuze",
-      "Pepsi Cola":"stock-pepsi",
-      "Mirinda Soda Cream":"stock-mirinda"
-    };
+  const params = new URLSearchParams(window.location.search);
+  let uid = params.get("uid") || localStorage.getItem("uid");
 
-    for (const [name,id] of Object.entries(products)) {
-      const span = document.getElementById(id);
-      if (span) span.textContent = inventory[name] || "0";
+  if (!uid) {
+    userName.textContent = "Sign In";
+    badge.onclick = () => window.location.href = "signin.html?redirect=dathang.html";
+    return;
+  }
+
+  try {
+    const resUser = await fetch(`https://harryfoodapi.minecraftalex052.workers.dev/users/${uid}`);
+    const data = await resUser.json();
+
+    if (data.error) {
+      userName.textContent = "Sign In";
+      badge.onclick = () => window.location.href = "signin.html?redirect=dathang.html";
+      return;
     }
-  };
+
+    userName.textContent = data.nickname;
+    badge.onclick = () => menu.classList.toggle("hidden");
+  } catch {
+    userName.textContent = "Sign In";
+    badge.onclick = () => window.location.href = "signin.html?redirect=dathang.html";
+  }
+};
+
+// --- Menu functions ---
+function viewAccount() {
+  const uid = localStorage.getItem("uid");
+  if (uid) {
+    window.location.href = `profile.html?uid=${uid}`;
+  } else {
+    window.location.href = "signin.html?redirect=dathang.html";
+  }
+}
+
+function logout() {
+  localStorage.removeItem("uid");
+  window.location.href = "index.html";
+}
+
+// --- Đóng menu khi click ra ngoài ---
+document.addEventListener("click", (e) => {
+  const menu = document.getElementById("userMenu");
+  const badge = document.getElementById("userBadge");
+  if (!badge.contains(e.target) && !menu.contains(e.target)) {
+    menu.classList.add("hidden");
+  }
+});
 </script>
+
+
+
 <nav>
     <strong><a href="index.html">Trở về trang chủ?</a></strong>
     
