@@ -250,6 +250,8 @@
 
   <h2 id="productName"></h2>
   <p id="productPrice"></p>
+  <p id="productStock"></p>
+
 
   <div id="userBadge" class="user-badge">
     <span id="userName">Sign In</span>
@@ -392,31 +394,34 @@
     return;
   }
 
-  try {
-    const resUser = await fetch(`https://harryfoodapi.minecraftalex052.workers.dev/users/${uid}`);
-    const data = await resUser.json();
-    console.log("Dữ liệu user:", data);
+try {
+  const resUser = await fetch(`https://harryfoodapi.minecraftalex052.workers.dev/users/${uid}`);
+  const data = await resUser.json();
+  console.log("Dữ liệu user:", data);
 
-    if (data && data.nickname && data.classroom) {
-      userName.textContent = data.nickname;
-      badge.onclick = () => menu.classList.toggle("hidden");
-      warning.classList.add("hidden");
-      nameInput.value = data.nickname;
-      classSelect.value = data.classroom;
-      nameInput.disabled = true;
-      classSelect.disabled = true;
-    } else {
-      throw new Error("User data invalid");
-    }
-  } catch (err) {
-    console.error("Lỗi fetch user:", err);
-    userName.textContent = "Sign In";
-    badge.onclick = () => window.location.href = "signin.html?redirect=detail.html";
-    warning.classList.remove("hidden");
-    nameInput.disabled = false;
-    classSelect.disabled = false;
+  if (data && (data.nickname || data.user?.nickname) && (data.classroom || data.user?.classroom)) {
+    const nickname = data.nickname || data.user.nickname;
+    const classroom = data.classroom || data.user.classroom;
+
+    userName.textContent = nickname;
+    badge.onclick = () => menu.classList.toggle("hidden");
+    warning.classList.add("hidden");
+    nameInput.value = nickname;
+    classSelect.value = classroom;
+    nameInput.disabled = true;
+    classSelect.disabled = true;
+  } else {
+    throw new Error("User data invalid");
   }
-});
+} catch (err) {
+  console.error("Lỗi fetch user:", err);
+  userName.textContent = "Sign In";
+  badge.onclick = () => window.location.href = "signin.html?redirect=detail.html";
+  warning.classList.remove("hidden");
+  nameInput.disabled = false;
+  classSelect.disabled = false;
+}
+
 
   </script>
 </body>
