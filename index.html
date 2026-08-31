@@ -64,10 +64,37 @@
       font-weight: 600;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
       cursor: pointer;
-      transition: background 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
     .user-badge:hover {
       background: #e6f0ff;
+    }
+
+    .user-menu {
+      position: absolute;
+      top: 45px;
+      right: 0;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      min-width: 140px;
+    }
+
+    .user-menu div {
+      padding: 10px;
+      cursor: pointer;
+    }
+    .user-menu div:hover {
+      background: #e6f0ff;
+    }
+
+    .hidden {
+      display: none;
     }
 
     /* Logo + slogan hoặc câu chào random */
@@ -117,52 +144,6 @@
       font-size: 14px;
       color: #555;
     }
-.user-badge {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background: white;
-  color: #0067b8;
-  padding: 10px 20px;
-  border-radius: 12px;
-  font-weight: 600;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.menu-toggle {
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.user-menu {
-  position: absolute;
-  top: 45px;
-  right: 0;
-  background: white;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  display: flex;
-  flex-direction: column;
-  min-width: 140px;
-}
-
-.user-menu div {
-  padding: 10px;
-  cursor: pointer;
-}
-.user-menu div:hover {
-  background: #e6f0ff;
-}
-
-.hidden {
-  display: none;
-}
-
   </style>
 </head>
 <body>
@@ -183,16 +164,13 @@
         <option value="en">English</option>
       </select>
     </div>
-    <div id="userBadge" class="user-badge">Sign In</div>
-<div id="userBadge" class="user-badge">
-  <span id="userName">Sign In</span>
-  <span class="menu-toggle">⋮</span>
-  <div id="userMenu" class="user-menu hidden">
-    <div onclick="viewAccount()">Xem tài khoản</div>
-    <div onclick="logout()">Đăng xuất</div>
-  </div>
-</div>
-
+    <div id="userBadge" class="user-badge">
+      <span id="userName">Sign In</span>
+      <div id="userMenu" class="user-menu hidden">
+        <div onclick="viewAccount()">Xem tài khoản</div>
+        <div onclick="logout()">Đăng xuất</div>
+      </div>
+    </div>
   </header>
 
   <footer>© 2026 HarryFood · All rights reserved</footer>
@@ -210,7 +188,6 @@ function setLanguage(lang) {
 }
 
 window.onload = async () => {
-  // Theme
   if (localStorage.getItem("theme") === "dark") {
     document.body.classList.add("dark-mode");
   }
@@ -219,13 +196,13 @@ window.onload = async () => {
   let uid = params.get("uid") || localStorage.getItem("uid");
 
   const badge = document.getElementById("userBadge");
+  const userName = document.getElementById("userName");
   const title = document.getElementById("mainTitle");
   const slogan = document.getElementById("mainSlogan");
 
   if (!uid) {
-    badge.textContent = "Sign In";
+    userName.textContent = "Sign In";
     badge.onclick = () => window.location.href = "signin.html";
-    // Giữ nguyên logo + slogan
     title.textContent = "HarryFood";
     slogan.textContent = "Make eating better";
     return;
@@ -236,7 +213,7 @@ window.onload = async () => {
     const data = await res.json();
 
     if (data.error) {
-      badge.textContent = "Sign In";
+      userName.textContent = "Sign In";
       badge.onclick = () => window.location.href = "signin.html";
       title.textContent = "HarryFood";
       slogan.textContent = "Make eating better";
@@ -244,7 +221,7 @@ window.onload = async () => {
     }
 
     const nickname = data.nickname;
-    badge.textContent = nickname;
+    userName.textContent = nickname;
 
     const greetings = [
       `Chào mừng trở lại, ${nickname}!`,
@@ -254,7 +231,6 @@ window.onload = async () => {
     ];
     const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
 
-    // Thay logo + slogan bằng câu chào random
     title.textContent = randomGreeting;
     slogan.textContent = "";
   } catch {
@@ -262,8 +238,15 @@ window.onload = async () => {
     slogan.textContent = "Make eating better";
   }
 };
-document.querySelector(".menu-toggle").addEventListener("click", () => {
-  document.getElementById("userMenu").classList.toggle("hidden");
+
+// Toggle menu khi click nickname
+document.getElementById("userBadge").addEventListener("click", () => {
+  const name = document.getElementById("userName").textContent;
+  if (name === "Sign In") {
+    window.location.href = "signin.html";
+  } else {
+    document.getElementById("userMenu").classList.toggle("hidden");
+  }
 });
 
 function viewAccount() {
@@ -272,9 +255,8 @@ function viewAccount() {
 
 function logout() {
   localStorage.removeItem("uid");
-  window.location.href = "index.html"; // quay về trạng thái chưa đăng nhập
+  window.location.href = "index.html";
 }
-
 </script>
 </body>
 </html>
