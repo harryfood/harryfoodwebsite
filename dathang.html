@@ -268,44 +268,56 @@
 
 <script>
 async function checkStock(productName) {
-  const res = await fetch("https://harryfoodapi.minecraftalex052.workers.dev/inventory");
-  const inventory = await res.json();
-  const stock = parseInt(inventory[productName] || "0");
+  try {
+    const res = await fetch("https://harryfoodapi.minecraftalex052.workers.dev/inventory");
+    const inventory = await res.json();
+    const stock = parseInt(inventory[productName] || "0");
 
-  if (stock <= 0) {
-    alert("Xin lỗi nhưng chúng tôi hết hàng rồi, quay lại sau nhé");
-  } else {
-    window.location.href = "detail.html?product=" + encodeURIComponent(productName);
+    if (stock <= 0) {
+      alert("Xin lỗi nhưng chúng tôi hết hàng rồi, quay lại sau nhé");
+    } else {
+      window.location.href = "detail.html?product=" + encodeURIComponent(productName);
+    }
+  } catch (err) {
+    console.error("Lỗi khi checkStock:", err);
+    alert("Không thể tải tồn kho, thử lại sau.");
   }
 }
 
-window.onload = async () => {
-  // --- Inventory ---
-  const res = await fetch("https://harryfoodapi.minecraftalex052.workers.dev/inventory");
-  const inventory = await res.json();
-  const products = {
-    "C2 Calamansi Tea":"stock-calamansi",
-    "C2 Lemon Tea":"stock-lemon",
-    "C2 Lychee Tea":"stock-lychee",
-    "C2 Icy Mint Lemon":"stock-icy-mint",
-    "C2 Strawberry Cherry":"stock-strawberry",
-    "C2 Melon Mint":"stock-melon",
-    "Fuze Tea Lemon Lemongrass":"stock-fuze",
-    "Pepsi Cola":"stock-pepsi",
-    "Mirinda Soda Cream":"stock-mirinda"
-  };
-  for (const [name,id] of Object.entries(products)) {
-    const span = document.getElementById(id);
-    if (span) span.textContent = inventory[name] || "0";
+async function loadInventory() {
+  try {
+    const res = await fetch("https://harryfoodapi.minecraftalex052.workers.dev/inventory");
+    const inventory = await res.json();
+    const products = {
+      "C2 Calamansi Tea":"stock-calamansi",
+      "C2 Lemon Tea":"stock-lemon",
+      "C2 Lychee Tea":"stock-lychee",
+      "C2 Icy Mint Lemon":"stock-icy-mint",
+      "C2 Strawberry Cherry":"stock-strawberry",
+      "C2 Melon Mint":"stock-melon",
+      "Fuze Tea Lemon Lemongrass":"stock-fuze",
+      "Pepsi Cola":"stock-pepsi",
+      "Mirinda Soda Cream":"stock-mirinda"
+    };
+    for (const [name,id] of Object.entries(products)) {
+      const span = document.getElementById(id);
+      if (span) span.textContent = inventory[name] || "0";
+    }
+  } catch (err) {
+    console.error("Lỗi tải inventory:", err);
   }
+}
 
-  // --- User Badge ---
+async function loadUserBadge() {
   const badge = document.getElementById("userBadge");
   const userName = document.getElementById("userName");
   const menu = document.getElementById("userMenu");
 
+  // Lấy UID từ URL hoặc localStorage
   const params = new URLSearchParams(window.location.search);
   let uid = params.get("uid") || localStorage.getItem("uid");
+
+  console.log("UID lấy được:", uid);
 
   if (!uid) {
     userName.textContent = "Sign In";
@@ -316,22 +328,22 @@ window.onload = async () => {
   try {
     const resUser = await fetch(`https://harryfoodapi.minecraftalex052.workers.dev/users/${uid}`);
     const data = await resUser.json();
+    console.log("Dữ liệu user:", data);
 
-    if (data.error) {
+    if (data && data.nickname) {
+      userName.textContent = data.nickname;
+      badge.onclick = () => menu.classList.toggle("hidden");
+    } else {
       userName.textContent = "Sign In";
       badge.onclick = () => window.location.href = "signin.html?redirect=dathang.html";
-      return;
     }
-
-    userName.textContent = data.nickname;
-    badge.onclick = () => menu.classList.toggle("hidden");
-  } catch {
+  } catch (err) {
+    console.error("Lỗi fetch user:", err);
     userName.textContent = "Sign In";
     badge.onclick = () => window.location.href = "signin.html?redirect=dathang.html";
   }
-};
+}
 
-// --- Menu functions ---
 function viewAccount() {
   const uid = localStorage.getItem("uid");
   if (uid) {
@@ -346,7 +358,6 @@ function logout() {
   window.location.href = "index.html";
 }
 
-// --- Đóng menu khi click ra ngoài ---
 document.addEventListener("click", (e) => {
   const menu = document.getElementById("userMenu");
   const badge = document.getElementById("userBadge");
@@ -354,7 +365,15 @@ document.addEventListener("click", (e) => {
     menu.classList.add("hidden");
   }
 });
+
+// --- Khởi chạy ---
+window.addEventListener("DOMContentLoaded", async () => {
+  await loadInventory();
+  await loadUserBadge();
+});
 </script>
+
+
 
 
 
